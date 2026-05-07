@@ -314,9 +314,11 @@ export default function WebtoonSchedulePage() {
 
       <style jsx>{`
         .notion-bg {
-          min-height: 100vh;
+          width: 100%;
+          height: 100vh;
           background: #ffffff;
           padding: 0;
+          margin: 0;
           overflow: hidden;
           display: flex;
           align-items: center;
@@ -330,8 +332,9 @@ export default function WebtoonSchedulePage() {
           width: 100%;
           display: flex;
           justify-content: center;
-          align-items: flex-start;
+          align-items: center;
           overflow: hidden;
+          margin: 0 auto;
         }
 
         .widget {
@@ -687,56 +690,69 @@ export default function WebtoonSchedulePage() {
           font-size: 11px;
         }
 
-        @media (prefers-color-scheme: dark) {
-          .notion-bg {
-            background: #191919;
-            color: #f1eeee;
+          :global(html),
+          :global(body) {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #ffffff;
           }
 
-          .ten-day {
-            color: #d6aebb;
-          }
+          @media (prefers-color-scheme: dark) {
+            :global(html),
+            :global(body) {
+              background: #191919;
+            }
 
-          .widget {
-            background: #202020;
-            border-color: #4a4044;
-            box-shadow: none;
-          }
+            .notion-bg {
+              background: #191919;
+              color: #f1eeee;
+            }
 
-          .line,
-          .date span {
-            background: #4a4044;
-          }
+            .ten-day {
+              color: #d6aebb;
+            }
 
-          .tab {
-            background: #202020;
-            border-color: #4a4044;
-            color: #f1eeee;
-          }
+            .widget {
+              background: #202020;
+              border-color: #4a4044;
+              box-shadow: none;
+            }
 
-          .tab.active {
-            background: #34262c;
-            border-color: #d9799f;
-          }
+            .line,
+            .date span {
+              background: #4a4044;
+            }
 
-          .refresh {
-            color: #e7dde1;
-          }
+            .tab {
+              background: #202020;
+              border-color: #4a4044;
+              color: #f1eeee;
+            }
 
-          .refresh:hover {
-            background: #34262c;
-          }
+            .tab.active {
+              background: #34262c;
+              border-color: #d9799f;
+            }
 
-          .cover {
-            background: #292426;
-            border-color: #4a4044;
-          }
+            .refresh {
+              color: #e7dde1;
+            }
 
-          .empty,
-          .date p {
-            color: #d1aebc;
+            .refresh:hover {
+              background: #34262c;
+            }
+
+            .cover {
+              background: #292426;
+              border-color: #4a4044;
+            }
+
+            .empty,
+            .date p {
+              color: #d1aebc;
+            }
           }
-        }
       `}</style>
     </main>
   );

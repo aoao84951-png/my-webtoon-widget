@@ -144,28 +144,41 @@ export default function WebtoonSchedulePage() {
   useEffect(() => {
     function resize() {
       if (!wrapRef.current || !widgetRef.current) return;
-    
+  
       const isMobile = window.innerWidth <= 600;
-    
+  
       if (isMobile) {
         setScale(1);
         setHeight(widgetRef.current.offsetHeight);
         return;
       }
-    
+  
       const containerWidth = wrapRef.current.clientWidth;
-      const nextScale = Math.min(1, containerWidth / DESIGN_WIDTH);
-    
+      const widgetHeight = widgetRef.current.offsetHeight;
+  
+      const availableWidth = containerWidth;
+      const availableHeight = window.innerHeight - 40;
+  
+      const widthScale = availableWidth / DESIGN_WIDTH;
+      const heightScale = availableHeight / widgetHeight;
+  
+      const nextScale = Math.min(1, widthScale, heightScale);
+  
       setScale(nextScale);
-      setHeight(widgetRef.current.offsetHeight * nextScale);
+      setHeight(widgetHeight * nextScale);
     }
-
+  
     resize();
-
+  
+    window.addEventListener("resize", resize);
+  
     const observer = new ResizeObserver(resize);
     if (wrapRef.current) observer.observe(wrapRef.current);
-
-    return () => observer.disconnect();
+  
+    return () => {
+      window.removeEventListener("resize", resize);
+      observer.disconnect();
+    };
   }, [items, selectedDay, page, loading]);
 
   const filteredItems = useMemo(() => {
@@ -362,12 +375,13 @@ export default function WebtoonSchedulePage() {
           width: 100%;
           min-height: 100vh;
           background: #ffffff;
-          padding: 0;
+          padding: 20px 0;
           margin: 0;
           overflow: hidden;
           display: flex;
           align-items: center;
           justify-content: center;
+          box-sizing: border-box;
           font-family: Inter, "Pretendard", -apple-system, BlinkMacSystemFont,
             "Segoe UI", "Apple SD Gothic Neo", sans-serif;
           color: #2f2a2d;
@@ -377,8 +391,8 @@ export default function WebtoonSchedulePage() {
           width: 100%;
           display: flex;
           justify-content: center;
-          align-items: center;
-          overflow: hidden;
+          align-items: flex-start;
+          overflow: visible;
           margin: 0 auto;
         }
 
@@ -821,7 +835,9 @@ export default function WebtoonSchedulePage() {
               width: 100%;
               transform: none !important;
               border-radius: 16px;
-              padding: 16px 14px 18px;
+              padding: 14px 12px 16px;
+              min-height: 690px;
+              box-sizing: border-box;
             }
 
             .desktop-tabs {
@@ -829,25 +845,26 @@ export default function WebtoonSchedulePage() {
             }
 
             .mobile-tabs {
+              position: relative;
               display: block;
-              margin-bottom: 14px;
+              margin-bottom: 12px;
             }
 
             .mobile-current-tab {
               width: 100%;
-              height: 42px;
-              border-radius: 14px;
+              height: 38px;
+              border-radius: 12px;
               border: 1px solid #d9789f;
               background: #fff4f7;
               color: #b88a98;
               font-family: inherit;
-              font-size: 13px;
+              font-size: 12px;
               font-weight: 800;
               letter-spacing: 0.06em;
               display: flex;
               align-items: center;
               justify-content: space-between;
-              padding: 0 14px;
+              padding: 0 12px;
               cursor: pointer;
             }
 
@@ -875,46 +892,64 @@ export default function WebtoonSchedulePage() {
             }
 
             .mobile-tab-list {
-              margin-top: 8px;
-              display: grid;
-              grid-template-columns: repeat(3, 1fr);
-              gap: 7px;
+              position: absolute;
+              z-index: 20;
+              top: 44px;
+              left: 0;
+              right: 0;
+              max-height: 190px;
+              overflow-y: auto;
+              padding: 6px;
+              border: 1px solid #eadde2;
+              border-radius: 14px;
+              background: rgba(255, 255, 255, 0.98);
+              box-shadow: 0 10px 28px rgba(180, 120, 145, 0.16);
             }
 
             .mobile-tab-item {
-              height: 36px;
-              border-radius: 12px;
-              border: 1px solid #eadde2;
-              background: #fbfbfb;
+              width: 100%;
+              height: 34px;
+              border-radius: 10px;
+              border: 0;
+              background: transparent;
               color: #9a858c;
               font-family: inherit;
               font-size: 11px;
               font-weight: 800;
               cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              padding: 0 10px;
+            }
+
+            .mobile-tab-item + .mobile-tab-item {
+              margin-top: 3px;
             }
 
             .mobile-tab-item.active {
               background: #fff4f7;
-              border-color: #d9789f;
               color: #d66f98;
             }
 
             .cards {
               display: flex;
               flex-direction: column;
-              gap: 10px;
-              min-height: auto;
+              gap: 8px;
+              min-height: 430px;
             }
 
             .card {
               display: grid;
-              grid-template-columns: 74px 1fr;
-              column-gap: 12px;
+              grid-template-columns: 58px 1fr;
+              grid-template-rows: auto auto auto;
+              column-gap: 10px;
               align-items: center;
               text-align: left;
-              padding: 8px;
+              min-height: 76px;
+              padding: 8px 10px;
               border: 1px solid #eadde2;
-              border-radius: 14px;
+              border-radius: 13px;
               background: #ffffff;
             }
 
@@ -932,16 +967,17 @@ export default function WebtoonSchedulePage() {
             }
 
             .cover {
-              width: 74px;
+              grid-row: 1 / 4;
+              width: 58px;
               aspect-ratio: 1 / 1.28;
-              border-radius: 10px;
+              border-radius: 9px;
             }
 
             .card h2 {
               grid-column: 2;
-              margin: 0 0 6px;
-              font-size: 13px;
-              line-height: 1.3;
+              margin: 0 0 4px;
+              font-size: 12px;
+              line-height: 1.25;
               white-space: normal;
               display: -webkit-box;
               -webkit-line-clamp: 2;
@@ -953,10 +989,16 @@ export default function WebtoonSchedulePage() {
               justify-content: flex-start;
             }
 
+            .platform {
+              min-height: 14px;
+              padding: 2px 6px;
+              font-size: 8px;
+            }
+
             .ten-day {
               grid-column: 2;
-              margin-top: 5px;
-              font-size: 10px;
+              margin-top: 3px;
+              font-size: 9px;
             }
 
             .date {
@@ -981,6 +1023,11 @@ export default function WebtoonSchedulePage() {
 
             .refresh {
               font-size: 10px;
+            }
+
+            .empty {
+              min-height: 430px;
+              height: 430px;
             }
           }
       `}</style>

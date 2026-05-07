@@ -122,6 +122,7 @@ export default function WebtoonSchedulePage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(0);
+  const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
 
   async function loadItems() {
     setRefreshing(true);
@@ -143,10 +144,18 @@ export default function WebtoonSchedulePage() {
   useEffect(() => {
     function resize() {
       if (!wrapRef.current || !widgetRef.current) return;
-
+    
+      const isMobile = window.innerWidth <= 600;
+    
+      if (isMobile) {
+        setScale(1);
+        setHeight(widgetRef.current.offsetHeight);
+        return;
+      }
+    
       const containerWidth = wrapRef.current.clientWidth;
       const nextScale = Math.min(1, containerWidth / DESIGN_WIDTH);
-
+    
       setScale(nextScale);
       setHeight(widgetRef.current.offsetHeight * nextScale);
     }
@@ -200,7 +209,7 @@ export default function WebtoonSchedulePage() {
 
           <div className="line" />
 
-          <nav className="tabs">
+          <nav className="tabs desktop-tabs">
             {DAYS.map((day) => {
               const active = selectedDay === day.key;
               const isToday = day.key === todayDay;
@@ -219,6 +228,42 @@ export default function WebtoonSchedulePage() {
               );
             })}
           </nav>
+
+          <div className="mobile-tabs">
+            <button
+              className="mobile-current-tab"
+              onClick={() => setMobileTabsOpen((prev) => !prev)}
+            >
+              <span>
+                {DAYS.find((day) => day.key === selectedDay)?.en}
+                {selectedDay === todayDay && <b>오늘</b>}
+              </span>
+              <em>{mobileTabsOpen ? "▲" : "▼"}</em>
+            </button>
+
+            {mobileTabsOpen && (
+              <div className="mobile-tab-list">
+                {DAYS.map((day) => {
+                  const active = selectedDay === day.key;
+                  const isToday = day.key === todayDay;
+
+                  return (
+                    <button
+                      key={day.key}
+                      className={`mobile-tab-item ${active ? "active" : ""}`}
+                      onClick={() => {
+                        setSelectedDay(day.key);
+                        setMobileTabsOpen(false);
+                      }}
+                    >
+                      <span>{day.en}</span>
+                      {isToday && <b>오늘</b>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           <div className="date">
             <span />
@@ -315,7 +360,7 @@ export default function WebtoonSchedulePage() {
       <style jsx>{`
         .notion-bg {
           width: 100%;
-          height: 100vh;
+          min-height: 100vh;
           background: #ffffff;
           padding: 0;
           margin: 0;
@@ -690,13 +735,13 @@ export default function WebtoonSchedulePage() {
           font-size: 11px;
         }
 
-          :global(html),
-          :global(body) {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: #ffffff;
-          }
+        :global(html),
+        :global(body) {
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          background: #ffffff;
+        }
 
           @media (prefers-color-scheme: dark) {
             :global(html),
@@ -751,6 +796,191 @@ export default function WebtoonSchedulePage() {
             .empty,
             .date p {
               color: #d1aebc;
+            }
+          }
+
+          .mobile-tabs {
+            display: none;
+          }
+
+          @media (max-width: 600px) {
+            .notion-bg {
+              height: auto;
+              min-height: 0;
+              display: block;
+              padding: 0;
+            }
+
+            .scale-wrap {
+              height: auto !important;
+              display: block;
+              overflow: visible;
+            }
+
+            .widget {
+              width: 100%;
+              transform: none !important;
+              border-radius: 16px;
+              padding: 16px 14px 18px;
+            }
+
+            .desktop-tabs {
+              display: none;
+            }
+
+            .mobile-tabs {
+              display: block;
+              margin-bottom: 14px;
+            }
+
+            .mobile-current-tab {
+              width: 100%;
+              height: 42px;
+              border-radius: 14px;
+              border: 1px solid #d9789f;
+              background: #fff4f7;
+              color: #b88a98;
+              font-family: inherit;
+              font-size: 13px;
+              font-weight: 800;
+              letter-spacing: 0.06em;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              padding: 0 14px;
+              cursor: pointer;
+            }
+
+            .mobile-current-tab span {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+            }
+
+            .mobile-current-tab b,
+            .mobile-tab-item b {
+              padding: 2px 6px;
+              border-radius: 999px;
+              background: #d66f98;
+              color: white;
+              font-size: 9px;
+              line-height: 1;
+              letter-spacing: 0;
+            }
+
+            .mobile-current-tab em {
+              font-style: normal;
+              font-size: 10px;
+              color: #c78da0;
+            }
+
+            .mobile-tab-list {
+              margin-top: 8px;
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 7px;
+            }
+
+            .mobile-tab-item {
+              height: 36px;
+              border-radius: 12px;
+              border: 1px solid #eadde2;
+              background: #fbfbfb;
+              color: #9a858c;
+              font-family: inherit;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            }
+
+            .mobile-tab-item.active {
+              background: #fff4f7;
+              border-color: #d9789f;
+              color: #d66f98;
+            }
+
+            .cards {
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              min-height: auto;
+            }
+
+            .card {
+              display: grid;
+              grid-template-columns: 74px 1fr;
+              column-gap: 12px;
+              align-items: center;
+              text-align: left;
+              padding: 8px;
+              border: 1px solid #eadde2;
+              border-radius: 14px;
+              background: #ffffff;
+            }
+
+            .card-link {
+              display: contents;
+            }
+
+            .card .platforms,
+            .card .ten-day {
+              grid-column: 2;
+            }
+
+            .card .platforms {
+              justify-content: flex-start;
+            }
+
+            .cover {
+              width: 74px;
+              aspect-ratio: 1 / 1.28;
+              border-radius: 10px;
+            }
+
+            .card h2 {
+              grid-column: 2;
+              margin: 0 0 6px;
+              font-size: 13px;
+              line-height: 1.3;
+              white-space: normal;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+            }
+
+            .platforms {
+              grid-column: 2;
+              justify-content: flex-start;
+            }
+
+            .ten-day {
+              grid-column: 2;
+              margin-top: 5px;
+              font-size: 10px;
+            }
+
+            .date {
+              margin-bottom: 12px;
+            }
+
+            .date p {
+              font-size: 12px;
+            }
+
+            .pager {
+              margin-top: 14px;
+            }
+
+            .header {
+              margin-bottom: 12px;
+            }
+
+            h1 {
+              font-size: 14px;
+            }
+
+            .refresh {
+              font-size: 10px;
             }
           }
       `}</style>

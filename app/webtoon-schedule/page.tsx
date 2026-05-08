@@ -9,6 +9,9 @@ type WebtoonItem = {
   platform: string;
   schedule: string;
   link: string;
+  genre: string;
+  drawingAuthor: string;
+  writingAuthor: string;
 };
 
 const DAYS = [
@@ -108,6 +111,14 @@ function getTenDayText(schedule: string) {
   return match[1];
 }
 
+function getAuthorText(item: WebtoonItem) {
+  const drawing = item.drawingAuthor?.trim();
+  const writing = item.writingAuthor?.trim();
+
+  if (drawing && writing && drawing !== writing) return `${drawing} · ${writing}`;
+  return drawing || writing || "";
+}
+
 export default function WebtoonSchedulePage() {
   const todayDay = getTodayKor();
 
@@ -122,7 +133,6 @@ export default function WebtoonSchedulePage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(0);
-  const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
 
   async function loadItems() {
     setRefreshing(true);
@@ -243,39 +253,24 @@ export default function WebtoonSchedulePage() {
           </nav>
 
           <div className="mobile-tabs">
-            <button
-              className="mobile-current-tab"
-              onClick={() => setMobileTabsOpen((prev) => !prev)}
-            >
-              <span>
-                {DAYS.find((day) => day.key === selectedDay)?.en}
-                {selectedDay === todayDay && <b>오늘</b>}
-              </span>
-              <em>{mobileTabsOpen ? "▲" : "▼"}</em>
-            </button>
+            {DAYS.map((day) => {
+              const active = selectedDay === day.key;
+              const isToday = day.key === todayDay;
 
-            {mobileTabsOpen && (
-              <div className="mobile-tab-list">
-                {DAYS.map((day) => {
-                  const active = selectedDay === day.key;
-                  const isToday = day.key === todayDay;
-
-                  return (
-                    <button
-                      key={day.key}
-                      className={`mobile-tab-item ${active ? "active" : ""}`}
-                      onClick={() => {
-                        setSelectedDay(day.key);
-                        setMobileTabsOpen(false);
-                      }}
-                    >
-                      <span>{day.en}</span>
-                      {isToday && <b>오늘</b>}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+              return (
+                <button
+                  key={day.key}
+                  className={`mobile-pill-tab ${active ? "active" : ""}`}
+                  onClick={() => {
+                    setSelectedDay(day.key);
+                    setPage(0);
+                  }}
+                >
+                  <span>{day.key === "10일" ? "10일" : day.key}</span>
+                  {isToday && <b>오늘</b>}
+                </button>
+              );
+            })}
           </div>
 
           <div className="date">
@@ -298,43 +293,73 @@ export default function WebtoonSchedulePage() {
             <section className="cards">
               {visibleItems.map((item) => (
                 <article key={item.id} className="card">
-                  <a
-                    className="card-link"
-                    href={item.link || undefined}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="cover">
-                      {item.cover ? (
-                        <img src={item.cover} alt={item.title} />
-                      ) : (
-                        <div className="no-cover">No Cover</div>
-                      )}
-                    </div>
-
-                    <h2>{item.title}</h2>
-                  </a>
-
-                  <div className="platforms">
-                    {splitPlatforms(item.platform).length > 0 ? (
-                      splitPlatforms(item.platform).map((platform) => (
-                        <span
-                          key={platform}
-                          className={`platform ${getPlatformClass(platform)}`}
-                        >
-                          {platform}
-                        </span>
-                      ))
+                <a
+                  className="cover-link"
+                  href={item.link || undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="cover">
+                    {item.cover ? (
+                      <img src={item.cover} alt={item.title} />
                     ) : (
-                      <span className="platform default">플랫폼 없음</span>
-                    )}
-
-                    {item.schedule.includes("10일") && (
-                      <span className="ten-day">{getTenDayText(item.schedule)}</span>
+                      <div className="no-cover">No Cover</div>
                     )}
                   </div>
+                </a>
+              
+                <div className="card-info">
+                  <div className="title-row">
+                    {selectedDay === todayDay && <span className="up-badge">UP</span>}
+                    <h2>{item.title}</h2>
+                  </div>
+              
+                  {getAuthorText(item) && (
+                    <div className="authors">{getAuthorText(item)}</div>
+                  )}
+              
+              <div className="meta-row">
+                <div className="platform-stack">
+                  <div className="platform-line">
+                    <div className="platforms">
+                      {splitPlatforms(item.platform).length > 0 ? (
+                        splitPlatforms(item.platform).map((platform) => (
+                          <span
+                            key={platform}
+                            className={`platform ${getPlatformClass(platform)}`}
+                          >
+                            {platform}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="platform default">플랫폼 없음</span>
+                      )}
 
-                </article>
+                      {item.genre && (
+                        <span className="genre">· {item.genre}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {item.schedule.includes("10일") && (
+                    <div className="ten-day">
+                      {getTenDayText(item.schedule)}
+                    </div>
+                  )}
+                </div>
+              </div>
+                </div>
+              
+                <a
+                  className="go-link mobile-only"
+                  href={item.link || undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${item.title} 보러가기`}
+                >
+                  ›
+                </a>
+              </article>
               ))}
             </section>
           )}
@@ -425,9 +450,9 @@ export default function WebtoonSchedulePage() {
 
         h1 {
           margin: 0;
-          font-size: 18px;
+          font-size: 13px;
           font-weight: 700;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.07em;
           color: #b88a98;
           text-transform: uppercase;
 
@@ -817,137 +842,180 @@ export default function WebtoonSchedulePage() {
             display: none;
           }
 
+          .cover-link {
+            display: block;
+            color: inherit;
+            text-decoration: none;
+          }
+
+          .mobile-only {
+            display: none;
+          }
+
+          .card-info {
+            margin-top: 8px;
+            text-align: center;
+          }
+
+          .title-row {
+            justify-content: center;
+          }
+
+          .up-badge {
+            display: none;
+          }
+
+          .authors {
+            margin-top: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #9a858c;
+            line-height: 1.2;
+          }
+
+          .meta-row {
+            margin-top: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+
+          .genre {
+            font-size: 10px;
+            font-weight: 700;
+            color: #9a858c;
+          }
+
           @media (max-width: 600px) {
             .notion-bg {
               height: auto;
               min-height: 0;
-              display: block;
+              display: flex;
+              justify-content: center;
               padding: 0;
             }
 
+            .refresh span:nth-child(2) {
+              display: none;
+            }
+
+            .refresh {
+              gap: 4px;
+              padding: 4px;
+            }
+
+            .refresh i {
+              width: 7px;
+              height: 7px;
+            }
+
+            .mobile-only {
+              display: flex;
+            }
+
+            .cover-link {
+              display: contents;
+            }
+
+            .up-badge {
+              display: inline-flex;
+            }
+
             .scale-wrap {
+              width: min(100%, 393px);
+              max-width: 393px;
               height: auto !important;
               display: block;
               overflow: visible;
             }
 
             .widget {
-              width: 100%;
+              width: min(100%, 393px);
+              max-width: 393px;
               transform: none !important;
               border-radius: 16px;
               padding: 10px 10px 12px;
               min-height: 0;
               box-sizing: border-box;
+              margin: 0 auto;
             }
 
             .desktop-tabs {
               display: none;
             }
 
-            .mobile-tabs {
-              position: relative;
-              display: block;
-              margin-bottom: 12px;
+            .mobile-tabs::-webkit-scrollbar {
+              display: none;
             }
 
-            .mobile-current-tab {
-              width: 100%;
-              height: 38px;
-              border-radius: 12px;
-              border: 1px solid #d9789f;
-              background: #fff4f7;
-              color: #b88a98;
+            .mobile-pill-tab {
+              position: relative;
+              flex: 0 0 auto;
+              min-width: 34px;
+              height: 32px;
+              padding: 0 10px;
+              border-radius: 999px;
+              border: 1px solid #eadde2;
+              background: #ffffff;
+              color: #3b3438;
               font-family: inherit;
-              font-size: 12px;
-              font-weight: 800;
-              letter-spacing: 0.06em;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              padding: 0 12px;
+              font-size: 10.5px;
+              font-weight: 700;
               cursor: pointer;
             }
 
-            .mobile-current-tab span {
-              display: flex;
-              align-items: center;
-              gap: 6px;
+            .mobile-pill-tab:last-child {
+              margin-right: 32px;
             }
 
-            .mobile-current-tab b,
-            .mobile-tab-item b {
-              padding: 2px 6px;
+            .mobile-pill-tab.active {
+              background: #e94b76;
+              border-color: #e94b76;
+              color: #ffffff;
+            }
+
+            .mobile-pill-tab b {
+              position: absolute;
+              right: -5px;
+              top: -4px;
+              padding: 2px 5px;
               border-radius: 999px;
               background: #d66f98;
-              color: white;
-              font-size: 9px;
+              color: #ffffff;
+              font-size: 8px;
               line-height: 1;
-              letter-spacing: 0;
-            }
-
-            .mobile-current-tab em {
-              font-style: normal;
-              font-size: 10px;
-              color: #c78da0;
-            }
-
-            .mobile-tab-list {
-              position: absolute;
-              z-index: 20;
-              top: 44px;
-              left: 0;
-              right: 0;
-              max-height: 190px;
-              overflow-y: auto;
-              padding: 6px;
-              border: 1px solid #eadde2;
-              border-radius: 14px;
-              background: rgba(255, 255, 255, 0.98);
-              box-shadow: 0 10px 28px rgba(180, 120, 145, 0.16);
-            }
-
-            .mobile-tab-item {
-              width: 100%;
-              height: 34px;
-              border-radius: 10px;
-              border: 0;
-              background: transparent;
-              color: #9a858c;
-              font-family: inherit;
-              font-size: 11px;
               font-weight: 800;
-              cursor: pointer;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              padding: 0 10px;
+              white-space: nowrap;
             }
 
-            .mobile-tab-item + .mobile-tab-item {
-              margin-top: 3px;
-            }
-
-            .mobile-tab-item.active {
-              background: #fff4f7;
-              color: #d66f98;
+            .mobile-pill-tab.active::after {
+              content: "";
+              position: absolute;
+              left: 50%;
+              bottom: -8px;
+              width: 5px;
+              height: 5px;
+              border-radius: 50%;
+              background: #e94b76;
+              transform: translateX(-50%);
             }
 
             .cards {
               display: flex;
               flex-direction: column;
               gap: 7px;
-              height: 340px;
-              min-height: 340px;
+              height: 390px;
+              min-height: 390px;
               overflow: hidden;
             }
 
             .card {
               display: grid;
-              grid-template-columns: 46px minmax(0, 1fr) auto;
+              grid-template-columns: 46px minmax(0, 1fr) 28px;
               align-items: center;
               column-gap: 10px;
-              height: 64px;
-              padding: 7px 12px;
+              height: 72px;
+              padding: 7px 10px;
               border: 1px solid #eadde2;
               border-radius: 14px;
               background: #ffffff;
@@ -956,15 +1024,11 @@ export default function WebtoonSchedulePage() {
               overflow: hidden;
             }
 
-            .card-link {
-              display: contents;
-            }
-
             .cover {
               grid-column: 1;
-              width: 38px;
-              height: 48px;
-              border-radius: 7px;
+              width: 42px;
+              height: 54px;
+              border-radius: 8px;
               overflow: hidden;
               align-self: center;
               justify-self: center;
@@ -977,8 +1041,30 @@ export default function WebtoonSchedulePage() {
               display: block;
             }
 
-            .card h2 {
+            .card-info {
               grid-column: 2;
+              min-width: 0;
+            }
+
+            .title-row {
+              display: flex;
+              align-items: center;
+              gap: 5px;
+              min-width: 0;
+            }
+
+            .up-badge {
+              flex: 0 0 auto;
+              padding: 2px 5px;
+              border-radius: 5px;
+              background: #e94b76;
+              color: white;
+              font-size: 7px;
+              font-weight: 900;
+              line-height: 1;
+            }
+
+            .card h2 {
               margin: 0;
               font-size: 11.5px;
               line-height: 1.2;
@@ -987,15 +1073,52 @@ export default function WebtoonSchedulePage() {
               text-overflow: ellipsis;
             }
 
-            .platforms {
-              grid-column: 3;
+            .authors {
+              margin-top: 4px;
+              font-size: 8.5px;
+              line-height: 1.1;
+              color: #8f7d84;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .meta-row {
+              margin-top: 5px;
+              display: flex;
+              align-items: center;
+              min-width: 0;
+            }
+
+            .platform-stack {
               display: flex;
               flex-direction: column;
-              align-items: flex-end;
-              justify-content: center;
+              align-items: flex-start;
+              gap: 2px;
+            }
+
+            .platform-line {
+              display: flex;
+              align-items: center;
+            }
+
+            .genre {
+              font-size: 8px;
+              font-weight: 700;
+              color: #8f7d84;
+              white-space: nowrap;
+              margin-left: 2px;
+              line-height: 1;
+            }
+
+            .platforms {
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+              flex-wrap: nowrap;
               gap: 3px;
               margin: 0;
-}
+            }
 
             .platform {
               min-height: 12px;
@@ -1004,16 +1127,68 @@ export default function WebtoonSchedulePage() {
               line-height: 1.1;
             }
 
+            .go-link {
+              grid-column: 3;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              background: #fff7fa;
+              color: #d9799f;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-decoration: none;
+              font-size: 22px;
+              font-weight: 700;
+              align-self: center;
+            }
+
             .ten-day {
               margin: 0;
-              font-size: 7px;
-              line-height: 1.1;
+              font-size: 6.5px;
+              line-height: 1;
+              font-weight: 800;
               color: #b38b98;
+              white-space: nowrap;
             }
 
             .empty {
-              min-height: 340px;
-              height: 340px;
+              min-height: 390px;
+              height: 390px;
+            }
+
+            .mobile-tabs {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              margin-bottom: 12px;
+              overflow-x: auto;
+              overflow-y: visible;
+              padding: 10px 28px 10px 0;
+              scrollbar-width: none;
+            }
+
+            .mobile-tabs::-webkit-scrollbar {
+              display: none;
+            }
+
+            .card-info {
+              grid-column: 2;
+              min-width: 0;
+              margin-top: 0;
+              text-align: left;
+            }
+
+            .title-row {
+              justify-content: flex-start;
+            }
+
+            .meta-row {
+              justify-content: flex-start;
+            }
+
+            .platform-stack {
+              align-items: flex-start;
             }
           }
       `}</style>

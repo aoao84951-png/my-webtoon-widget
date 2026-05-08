@@ -100,6 +100,9 @@ export async function GET() {
         platform: getPlainText(properties["플랫폼"]),
         schedule: getPlainText(properties["연재일/연재주기"]),
         link: getUrl(properties["플랫폼 링크"]),
+        genre: getPlainText(properties["장르"]),
+        drawingAuthor: getPlainText(properties["그림작가"]),
+        writingAuthor: getPlainText(properties["글작가"]),
       };
     });
 

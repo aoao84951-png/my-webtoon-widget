@@ -305,6 +305,10 @@ export default function WebtoonSchedulePage() {
                     ) : (
                       <div className="no-cover">No Cover</div>
                     )}
+
+                    {item.schedule.includes("10일") && (
+                      <span className="cover-ten-day">{getTenDayText(item.schedule)}</span>
+                    )}
                   </div>
                 </a>
               
@@ -422,6 +426,7 @@ export default function WebtoonSchedulePage() {
 
         .widget {
           width: ${DESIGN_WIDTH}px;
+          height: 455px;
           transform-origin: top center;
           border: 1px solid #e8dce1;
           border-radius: 16px;
@@ -429,6 +434,7 @@ export default function WebtoonSchedulePage() {
           padding: 18px 22px 20px;
           box-sizing: border-box;
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.035);
+          overflow: hidden;
         }
 
         .header {
@@ -584,7 +590,9 @@ export default function WebtoonSchedulePage() {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
           gap: 15px;
-          min-height: 196px;
+
+          min-height: 235px;
+          align-items: start;
         }
 
         .card {
@@ -609,6 +617,21 @@ export default function WebtoonSchedulePage() {
           overflow: hidden;
           background: #f7f1f4;
           border: 1px solid #e8dce1;
+          position: relative;
+        }
+
+        .cover-ten-day {
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          padding: 6px 9px;
+          border-radius: 0 8px 0 0;
+          background: rgba(47, 42, 45, 0.86);
+          color: #ffffff;
+          font-size: 10px;
+          font-weight: 800;
+          line-height: 1;
+          letter-spacing: -0.02em;
         }
 
         .cover img {
@@ -705,16 +728,12 @@ export default function WebtoonSchedulePage() {
         }
 
         .ten-day {
-          margin: 0;
-          font-size: 7px;
-          line-height: 1.1;
-          font-weight: 800;
-          color: #b38b98;
-          white-space: nowrap;
+          display: none;
         }
 
         .empty {
-          height: 196px;
+          height: 225px;
+          min-height: 225px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -722,7 +741,6 @@ export default function WebtoonSchedulePage() {
           font-size: 13px;
           font-weight: 600;
         }
-
         .pager {
           margin-top: 10px;
           display: flex;
@@ -791,10 +809,6 @@ export default function WebtoonSchedulePage() {
             .notion-bg {
               background: #191919;
               color: #f1eeee;
-            }
-
-            .ten-day {
-              color: #d6aebb;
             }
 
             .widget {
@@ -888,13 +902,13 @@ export default function WebtoonSchedulePage() {
 
           @media (max-width: 600px) {
             .notion-bg {
-              height: auto;
-              min-height: 0;
+              height: 100vh;
+              min-height: 100vh;
               display: flex;
+              align-items: center;
               justify-content: center;
               padding: 0;
             }
-
             .refresh span:nth-child(2) {
               display: none;
             }
@@ -932,12 +946,14 @@ export default function WebtoonSchedulePage() {
             .widget {
               width: min(100%, 393px);
               max-width: 393px;
+              height: 455px;
               transform: none !important;
               border-radius: 16px;
               padding: 10px 10px 12px;
               min-height: 0;
               box-sizing: border-box;
               margin: 0 auto;
+              overflow: hidden;
             }
 
             .desktop-tabs {
@@ -962,10 +978,6 @@ export default function WebtoonSchedulePage() {
               font-size: 10.5px;
               font-weight: 700;
               cursor: pointer;
-            }
-
-            .mobile-pill-tab:last-child {
-              margin-right: 32px;
             }
 
             .mobile-pill-tab.active {
@@ -1003,10 +1015,26 @@ export default function WebtoonSchedulePage() {
             .cards {
               display: flex;
               flex-direction: column;
+              align-items: stretch;
               gap: 7px;
-              height: 390px;
-              min-height: 390px;
-              overflow: hidden;
+              height: 260px;
+              min-height: 260px;
+              overflow-y: auto;
+              overflow-x: hidden;
+              padding-right: 2px;
+            }
+
+            .cards::-webkit-scrollbar {
+              width: 3px;
+            }
+
+            .cards::-webkit-scrollbar-thumb {
+              background: #eadde2;
+              border-radius: 999px;
+            }
+
+            .cards::-webkit-scrollbar-track {
+              background: transparent;
             }
 
             .card {
@@ -1015,15 +1043,15 @@ export default function WebtoonSchedulePage() {
               align-items: center;
               column-gap: 10px;
               height: 72px;
+              flex: 0 0 72px;
+              width: 100%;
               padding: 7px 10px;
               border: 1px solid #eadde2;
               border-radius: 14px;
               background: #ffffff;
               text-align: left;
               box-sizing: border-box;
-              overflow: hidden;
             }
-
             .cover {
               grid-column: 1;
               width: 42px;
@@ -1138,23 +1166,40 @@ export default function WebtoonSchedulePage() {
               align-items: center;
               justify-content: center;
               text-decoration: none;
-              font-size: 22px;
+              font-size: 18px;
               font-weight: 700;
+              line-height: 1;
+              padding-bottom: 1px;
               align-self: center;
             }
 
             .ten-day {
-              margin: 0;
+              display: none;
+            }
+
+            .cover-ten-day {
+              display: inline-flex;
+              position: absolute;
+              left: 0;
+              bottom: 0;
+              padding: 3px 5px;
+              border-radius: 0 6px 0 0;
+              background: rgba(47, 42, 45, 0.86);
+              color: #ffffff;
               font-size: 6.5px;
-              line-height: 1;
               font-weight: 800;
-              color: #b38b98;
-              white-space: nowrap;
+              line-height: 1;
             }
 
             .empty {
               min-height: 390px;
               height: 390px;
+
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              transform: translateY(-55px);
             }
 
             .mobile-tabs {
@@ -1164,8 +1209,14 @@ export default function WebtoonSchedulePage() {
               margin-bottom: 12px;
               overflow-x: auto;
               overflow-y: visible;
-              padding: 10px 28px 10px 0;
+              padding: 10px 0 10px 0;
+              scroll-padding-right: 0;
               scrollbar-width: none;
+            }
+
+            .mobile-tabs::after {
+              content: "";
+              flex: 0 0 1px;
             }
 
             .mobile-tabs::-webkit-scrollbar {

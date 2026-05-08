@@ -780,24 +780,33 @@ export default function WebtoonSearchPage() {
         }
 
         :global(:root) {
-          --bg: #fffafb;
-          --topbar: #f6e8ec;
-          --border: #ead5dc;
-          --line: #f0dce2;
+          --bg: #ffffff;
+          --topbar: #faf6f6;
+
+          --border: #f0e3e3;
+          --line: #f3e8e8;
+
           --input-bg: #ffffff;
-          --input-border: #ead5dc;
-          --placeholder: #cfb8c0;
-          --text: #7e6b72;
-          --muted: #b59ca5;
-          --time: #a58590;
-          --dot: #deb8c3;
-          --back: #c8a5af;
-          --no-cover: #f1dfe5;
-          --scroll: #e6c4ce;
-          --button-hover: #f4e4e9;
-          --badge-bg: #f1dce4;
-          --badge-text: #9b6f7c;
-          --saved-bg: #f4e4e9;
+          --input-border: #eadede;
+
+          --placeholder: #c7b8b8;
+
+          --text: #7d6f6f;
+          --muted: #b19f9f;
+          --time: #9f8b8b;
+
+          --dot: #e5d4d4;
+          --back: #c9b1b1;
+
+          --no-cover: #f4ebeb;
+          --scroll: #e2cfcf;
+
+          --button-hover: #f8f1f1;
+
+          --badge-bg: #f6eeee;
+          --badge-text: #9a7f7f;
+
+          --saved-bg: #f7efef;
         }
 
         @media (prefers-color-scheme: dark) {

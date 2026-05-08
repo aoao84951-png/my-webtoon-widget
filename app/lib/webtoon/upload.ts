@@ -14,16 +14,28 @@ async function fetchNaverImage(url: string) {
     filename: string
   ) {
     const isNaverImage = imageUrl.includes("comicthumb-phinf.pstatic.net");
+    const isBomtoonImage = imageUrl.includes("image.balcony.studio");
   
-    if (isNaverImage) {
-      const imageRes = await fetchNaverImage(imageUrl);
+    if (isNaverImage || isBomtoonImage) {
+      const imageRes = isNaverImage
+        ? await fetchNaverImage(imageUrl)
+        : await fetch(imageUrl, {
+            headers: {
+              "User-Agent": "Mozilla/5.0",
+              Referer: "https://www.bomtoon.com/",
+            },
+          });
   
       if (!imageRes.ok) {
-        throw new Error("네이버 이미지 fetch 실패");
+        throw new Error("이미지 fetch 실패");
       }
   
       const imageBuffer = await imageRes.arrayBuffer();
-      const contentType = imageRes.headers.get("content-type") || "image/jpeg";
+      let contentType = imageRes.headers.get("content-type") || "image/jpeg";
+
+      if (contentType === "image/jpg") {
+        contentType = "image/jpeg";
+      }
   
       const createRes = await fetch("https://api.notion.com/v1/file_uploads", {
         method: "POST",

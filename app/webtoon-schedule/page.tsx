@@ -328,13 +328,12 @@ export default function WebtoonSchedulePage() {
                     ) : (
                       <span className="platform default">플랫폼 없음</span>
                     )}
+
+                    {item.schedule.includes("10일") && (
+                      <span className="ten-day">{getTenDayText(item.schedule)}</span>
+                    )}
                   </div>
 
-                  {item.schedule.includes("10일") && (
-                    <div className="ten-day">
-                      {getTenDayText(item.schedule)}
-                    </div>
-                  )}
                 </article>
               ))}
             </section>
@@ -479,7 +478,7 @@ export default function WebtoonSchedulePage() {
         .line {
           height: 1px;
           background: #eadde2;
-          margin: 15px 0 17px;
+          margin: 10px 0 12px;
         }
 
         .tabs {
@@ -541,7 +540,7 @@ export default function WebtoonSchedulePage() {
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
           gap: 12px;
-          margin-bottom: 17px;
+          margin-bottom: 9px;
         }
 
         .date span {
@@ -681,11 +680,12 @@ export default function WebtoonSchedulePage() {
         }
 
         .ten-day {
-          margin-top: 5px;
-          font-size: 10px;
-          font-weight: 700;
+          margin: 0;
+          font-size: 7px;
+          line-height: 1.1;
+          font-weight: 800;
           color: #b38b98;
-          letter-spacing: -0.01em;
+          white-space: nowrap;
         }
 
         .empty {
@@ -699,7 +699,7 @@ export default function WebtoonSchedulePage() {
         }
 
         .pager {
-          margin-top: 18px;
+          margin-top: 10px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -835,8 +835,8 @@ export default function WebtoonSchedulePage() {
               width: 100%;
               transform: none !important;
               border-radius: 16px;
-              padding: 14px 12px 16px;
-              min-height: 690px;
+              padding: 10px 10px 12px;
+              min-height: 0;
               box-sizing: border-box;
             }
 
@@ -935,99 +935,85 @@ export default function WebtoonSchedulePage() {
             .cards {
               display: flex;
               flex-direction: column;
-              gap: 8px;
-              min-height: 430px;
+              gap: 7px;
+              height: 340px;
+              min-height: 340px;
+              overflow: hidden;
             }
 
             .card {
               display: grid;
-              grid-template-columns: 58px 1fr;
-              grid-template-rows: auto auto auto;
-              column-gap: 10px;
+              grid-template-columns: 46px minmax(0, 1fr) auto;
               align-items: center;
-              text-align: left;
-              min-height: 76px;
-              padding: 8px 10px;
+              column-gap: 10px;
+              height: 64px;
+              padding: 7px 12px;
               border: 1px solid #eadde2;
-              border-radius: 13px;
+              border-radius: 14px;
               background: #ffffff;
+              text-align: left;
+              box-sizing: border-box;
+              overflow: hidden;
             }
 
             .card-link {
               display: contents;
             }
 
-            .card .platforms,
-            .card .ten-day {
-              grid-column: 2;
-            }
-
-            .card .platforms {
-              justify-content: flex-start;
-            }
-
             .cover {
-              grid-row: 1 / 4;
-              width: 58px;
-              aspect-ratio: 1 / 1.28;
-              border-radius: 9px;
+              grid-column: 1;
+              width: 38px;
+              height: 48px;
+              border-radius: 7px;
+              overflow: hidden;
+              align-self: center;
+              justify-self: center;
+            }
+
+            .cover img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              display: block;
             }
 
             .card h2 {
               grid-column: 2;
-              margin: 0 0 4px;
-              font-size: 12px;
-              line-height: 1.25;
-              white-space: normal;
-              display: -webkit-box;
-              -webkit-line-clamp: 2;
-              -webkit-box-orient: vertical;
+              margin: 0;
+              font-size: 11.5px;
+              line-height: 1.2;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
 
             .platforms {
-              grid-column: 2;
-              justify-content: flex-start;
-            }
+              grid-column: 3;
+              display: flex;
+              flex-direction: column;
+              align-items: flex-end;
+              justify-content: center;
+              gap: 3px;
+              margin: 0;
+}
 
             .platform {
-              min-height: 14px;
-              padding: 2px 6px;
-              font-size: 8px;
+              min-height: 12px;
+              padding: 1px 6px;
+              font-size: 7.5px;
+              line-height: 1.1;
             }
 
             .ten-day {
-              grid-column: 2;
-              margin-top: 3px;
-              font-size: 9px;
-            }
-
-            .date {
-              margin-bottom: 12px;
-            }
-
-            .date p {
-              font-size: 12px;
-            }
-
-            .pager {
-              margin-top: 14px;
-            }
-
-            .header {
-              margin-bottom: 12px;
-            }
-
-            h1 {
-              font-size: 14px;
-            }
-
-            .refresh {
-              font-size: 10px;
+              margin: 0;
+              font-size: 7px;
+              line-height: 1.1;
+              color: #b38b98;
             }
 
             .empty {
-              min-height: 430px;
-              height: 430px;
+              min-height: 340px;
+              height: 340px;
             }
           }
       `}</style>
